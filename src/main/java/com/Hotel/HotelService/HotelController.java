@@ -14,5 +14,8 @@ public class HotelController {
     public List<Hotel> getHotels() {
         return hotelService.getAllHotels();
     }
-
+    @PostMapping("/hotels")
+    public Hotel createHotel(@RequestBody Hotel hotel) {
+        return hotelService.createHotel(hotel);
+    }
 }

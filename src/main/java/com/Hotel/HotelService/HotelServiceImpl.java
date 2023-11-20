@@ -1,14 +1,20 @@
 package com.Hotel.HotelService;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
- @Service
+import java.util.Optional;
+
+@Service
 public class HotelServiceImpl implements HotelService {
 
-    @Autowired
-    HotelRepository hotelRepository;
+    private final HotelRepository hotelRepository;
+
+    // Injection de dépendance via le constructeur
+    public HotelServiceImpl(HotelRepository hotelRepository) {
+        this.hotelRepository = hotelRepository;
+    }
+
     @Override
     public List<Hotel> getAllHotels() {
         return hotelRepository.findAll();
@@ -16,21 +22,33 @@ public class HotelServiceImpl implements HotelService {
 
     @Override
     public Hotel getHotelById(Long id) {
-        return null;
+        Optional<Hotel> optionalHotel = hotelRepository.findById(id);
+        return optionalHotel.orElse(null);
     }
 
     @Override
     public Hotel createHotel(Hotel hotel) {
-        return null;
+        // Ajout de validation ou de logique de création si nécessaire
+        return hotelRepository.save(hotel);
     }
 
     @Override
     public Hotel updateHotel(Long id, Hotel hotel) {
-        return null;
+        Optional<Hotel> optionalExistingHotel = hotelRepository.findById(id);
+
+        if (optionalExistingHotel.isPresent()) {
+            Hotel existingHotel = optionalExistingHotel.get();
+            // Copier les propriétés non nulles de hotel vers existingHotel
+            BeanUtils.copyProperties(hotel, existingHotel, "id");
+            return hotelRepository.save(existingHotel);
+        } else {
+            // Gérer le cas où l'hôtel n'est pas trouvé
+            return null;
+        }
     }
 
     @Override
     public void deleteHotel(Long id) {
-
+        hotelRepository.deleteById(id);
     }
 }
